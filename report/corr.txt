@@ -1,0 +1,6 @@
+<h1> CLUSTERING </h1>
+${plotter.boxplot(id = 'corr', header=False)}
+${plotter.hash_vars["median"]}
+${plotter.hash_vars["max"]}
+${plotter.hash_vars["min"]}
+
