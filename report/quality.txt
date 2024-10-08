@@ -1,0 +1,14 @@
+<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
+		${plotter.boxplot(id = 'quality_metrics', row_names= False, header=True, title= "(A) Mean distance between groups", x_label= "Mean distance (normalized)",
+			fields=[2], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"], "colorBy": "execution_type"})}
+		${plotter.boxplot(id = 'quality_metrics', row_names= False, header=True, title= "(B) Median distance between groups", x_label= "Median distance (normalized)",
+ 		fields=[3], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"], "colorBy": "execution_type"})}
+</div>
+<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
+		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[4,2],  title= "(C) Mean distance vs group size", 
+			x_label= "Group size", y_label= "Mean distance (normalized)",
+		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[4,3],  title= "(D) Median distance vs group size", 
+			x_label= "Group size", y_label= "Median distance (normalized)",
+		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+</div>

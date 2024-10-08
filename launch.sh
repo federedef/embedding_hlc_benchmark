@@ -1,38 +1,48 @@
 #!/usr/bin/env bash
 export EXEC_PATH=$FSCRATCH/RARE_testing
+export INITIAL_PATH=`pwd`
 export CODE_PATH=~/projects/RARE/src
-export INPUT_PATH=~/projects/RARE_testing/dataset
-export REPORT_PATH=~/projects/RARE_testing/report
+export INPUT_PATH=$INITIAL_PATH/dataset
+export REPORT_PATH=$INITIAL_PATH/report
 
 datasets="ecoli_STRING_700 karate_club lesmis"
 datasets="karate_club lesmis ecoli_STRING_700"
 datasets="human_STRING_900 human_STRING_700"
 if [ "$1" == "d" ] ; then
-    # Preparing the datasets
+    # # Preparing the datasets
     source ~soft_bio_267/initializes/init_python
-    # get datasets
-    for dataset in $datasets ; do
-        cp ~/projects/network_hlc_benchmark/dataset/$dataset ./dataset/edges/
-    done
-    # create translators
-    for dataset in $datasets ; do
-        cut -f 1 ./dataset/edges/$dataset > tmp && cut -f 2 ./dataset/edges/$dataset >> tmp
-        sort tmp | uniq | awk 'BEGIN{OFS="\t"}{print $1,NR}' > ./dataset/translators/$dataset
-        rm tmp
-    done
-    # get communities
-    for dataset in $datasets ; do
-        echo "$dataset"
-        cp $FSCRATCH/network_hlc_benchmark/$dataset/test.py_0000/formated_cls ./dataset/clusters/
-        echo "#nodes labels" > ./dataset/clusters/$dataset
-        awk 'BEGIN{OFS=" "}{print $2,$1}' ./dataset/clusters/formated_cls >> ./dataset/clusters/$dataset
-        rm ./dataset/clusters/formated_cls 
-    done
-    # translate datasets and communities
-    for dataset in $datasets ; do
-        sed -i "s/\t/ /g" ./dataset/edges/$dataset
-        standard_name_replacer -i ./dataset/edges/$dataset -I ./dataset/translators/$dataset -c 1,2 -u -s " " > tmp && mv tmp ./dataset/edges/$dataset
-        standard_name_replacer -i ./dataset/clusters/$dataset -I ./dataset/translators/$dataset -s " " -c 1 -u > tmp && mv tmp ./dataset/clusters/$dataset
+    # # get datasets
+    # for dataset in $datasets ; do
+    #     cp ~/projects/network_hlc_benchmark/dataset/$dataset ./dataset/edges/
+    # done
+    # # create translators
+    # for dataset in $datasets ; do
+    #     cut -f 1 ./dataset/edges/$dataset > tmp && cut -f 2 ./dataset/edges/$dataset >> tmp
+    #     sort tmp | uniq | awk 'BEGIN{OFS="\t"}{print $1,NR}' > ./dataset/translators/$dataset
+    #     rm tmp
+    # done
+    # # get communities
+    # for dataset in $datasets ; do
+    #     echo "$dataset"
+    #     cp $FSCRATCH/network_hlc_benchmark/$dataset/test.py_0000/formated_cls ./dataset/clusters/
+    #     echo "#nodes labels" > ./dataset/clusters/$dataset
+    #     awk 'BEGIN{OFS=" "}{print $2,$1}' ./dataset/clusters/formated_cls >> ./dataset/clusters/$dataset
+    #     rm ./dataset/clusters/formated_cls 
+    # done
+
+    # # translate datasets and communities
+    # for dataset in $datasets ; do
+    #     sed -i "s/\t/ /g" ./dataset/edges/$dataset
+    #     standard_name_replacer -i ./dataset/edges/$dataset -I ./dataset/translators/$dataset -c 1,2 -u -s " " > tmp && mv tmp ./dataset/edges/$dataset
+    #     standard_name_replacer -i ./dataset/clusters/$dataset -I ./dataset/translators/$dataset -s " " -c 1 -u > tmp && mv tmp ./dataset/clusters/$dataset
+    # done
+
+    # get externals
+    #wget https://reactome.org/download/current/Ensembl2Reactome.txt -O ./dataset/externals/reactome
+    for protein in "human_STRING_700" "human_STRING_900" ; do
+        sed "s/9606.ENS/ENS/g" ./dataset/translators/"$protein" > tmp && mv tmp ./dataset/translators/"$protein"
+        grep "ENSP" ./dataset/externals/reactome | grep "Homo sapiens" |
+         awk 'BEGIN{OFS="\t";FS="\t"}{print $2,$1}' | standard_name_replacer -i - -I ./dataset/translators/"$protein" -c 2 -u > ./dataset/externals/"$protein"
     done
 fi
 
@@ -44,7 +54,9 @@ if [ "$1" == "wf" ] ; then
           \\$dataset=$dataset,
           \\$input_path=$INPUT_PATH,
           \\$template=$REPORT_PATH,
-          \\$code_path=$CODE_PATH
+          \\$code_path=$CODE_PATH,
+          \\$external_path=$INPUT_PATH/externals/$dataset,
+          \\$scripts_code=$INITIAL_PATH/scripts
         " | tr -d [:space:]`
         AutoFlow -e -w ./workflow.sh -V $variables -o $EXEC_PATH/$dataset -m 20gb -t 3-00:00:00 -n cal -s 3 
     done
