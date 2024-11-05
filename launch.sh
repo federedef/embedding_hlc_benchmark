@@ -1,18 +1,10 @@
 #!/usr/bin/env bash
 export EXEC_PATH=$FSCRATCH/RARE_testing
+export CODE_PATH=~/projects/RARE/src 
+mkdir -p $EXEC_PATH
 export INITIAL_PATH=`pwd`
-export CODE_PATH=~/projects/RARE/src
 export INPUT_PATH=$INITIAL_PATH/dataset
 export REPORT_PATH=$INITIAL_PATH/report
-mkdir -p $EXEC_PATH
-
-if [ "$2" == "c" ] ; then
-    export EXEC_PATH=$FSCRATCH/custom_random
-    export CODE_PATH=~/projects/ComWalkEmbedding/src
-else
-    export EXEC_PATH=$FSCRATCH/RARE_testing
-    export CODE_PATH=~/projects/RARE/src
-fi 
 
 datasets="ecoli_STRING_700 karate_club lesmis"
 datasets="karate_club lesmis ecoli_STRING_700"
