@@ -91,14 +91,7 @@ lst = open_lst(opts.lst)
 lst2position = {n: p for p, n in enumerate(lst)}
 position2lst ={p: n for p, n in enumerate(lst)}
 ext_groups = get_external_groups(opts.external_groups)
-# print(ext_groups)
 G = read_graph(opts.input, " ")
-
-# print("HEYYYYYYYYYYYYYYY")
-# c = [len(c) for c in sorted(nx.connected_components(G), key=len, reverse=True)]
-# print(c)
-# print(nx.is_connected(G))
-# print("==================")
 
 group2metric = {name: get_cluster_metrics(nodes, G) for name, nodes in ext_groups.items()}
 # get distance
@@ -109,11 +102,7 @@ np.fill_diagonal(norm_distance_matrix,0)
 with open("quality_metrics","w") as f:
 	for group_name,nodes in ext_groups.items():
 		mean, median, size=get_average_distance(norm_distance_matrix, lst2position, nodes)
-		# print(size)
-		# print(str(size))
-		# print("\t".join([str(group_name),str(mean),str(median),str(size)]))
 		if size == 1 or size == 0 : continue
-		# print("\t".join([str(group_name),str(mean),str(median),str(size)]) +"\t"++ "\t".join([str(x) for x in group2metric[group_name]]) + "\n")
 		f.write("\t".join([str(group_name),str(mean),str(median),str(size)])+"\t"+ "\t".join([str(x) for x in group2metric[group_name]]) + "\n")
 
 
@@ -124,32 +113,6 @@ with open("relative_quality_metrics","w") as f:
 		mean, median, size = get_average_distance(norm_distance_matrix, lst2position, nodes)
 		if size == 1 or size == 0 : continue
 		f.write("\t".join([str(group_name),str(mean),str(median),str(size)]) +"\t"+ "\t".join([str(x) for x in group2metric[group_name]]) + "\n")
-
-
-# --------------------------- #
-# def get_pos(group, lst2position, position2lst, distance_matrix):
-# 	scores = []
-# 	for node in group:
-# 		# lst2position(node)
-# 		node_poscore = pxc.get_rank_metrics(-distance_matrix[lst2position[node],:], position2lst)
-# 		node_poscore = {row[0]: row[1:-1] for row in node_poscore}
-# 		for positive in group - {node}:
-# 			scores.append(node_poscore[positive][1])
-# 	return scores
-
-# from itertools import combinations
-
-# all_scores = []
-# for node_group in ext_groups.values():
-# 	# positives = list(itertools.combinations(list(node_group),2))
-# 	# negatives = random.choices(list(universe-positive), k=len(positives))
-# 	# negatives = zip(node_group,negatives)
-# 	scores= get_pos(node_group, lst2position, position2lst, distance_matrix)
-# 	all_scores.extend(scores)
-
-# with open("relative_pos", "w") as f:
-# 	for score in all_scores:
-# 		f.write(str(score)+"\n")
 
 
 
