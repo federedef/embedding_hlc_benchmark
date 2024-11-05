@@ -5,12 +5,9 @@ mkdir -p $EXEC_PATH
 export INITIAL_PATH=`pwd`
 export INPUT_PATH=$INITIAL_PATH/dataset
 export REPORT_PATH=$INITIAL_PATH/report
+datasets="human_STRING_900 human_STRING_700"
 
-datasets="ecoli_STRING_700 karate_club lesmis"
-datasets="karate_club lesmis ecoli_STRING_700"
-datasets="human_STRING_900 human_STRING_700"
-datasets="human_STRING_900"
-datasets="human_STRING_900 human_STRING_700"
+
 if [ "$1" == "d" ] ; then
     # Preparing the datasets
     source ~soft_bio_267/initializes/init_python
