@@ -78,24 +78,6 @@ if [ "$1" == "wf" ] ; then
     done
 fi
 
-if [ "$1" == "cwf" ] ; then
-    source ~soft_bio_267/initializes/init_autoflow
-    export EXEC_PATH=$FSCRATCH/custom_random
-    export CODE_PATH=~/projects/ComWalkEmbedding/src
-    mkdir -p $EXEC_PATH
-    for dataset in $datasets ; do
-        variables=`echo -e "
-          \\$dataset=$dataset,
-          \\$input_path=$INPUT_PATH,
-          \\$template=$REPORT_PATH,
-          \\$code_path=$CODE_PATH,
-          \\$external_path=$INPUT_PATH/externals/$dataset,
-          \\$scripts_code=$INITIAL_PATH/scripts
-        " | tr -d [:space:]`
-        AutoFlow -e -w ./workflow_custom.sh -V $variables -o $EXEC_PATH/$dataset -m 20gb -t 3-00:00:00 -n cal -s 3 
-    done
-fi
-
 if [ "$1" == "r" ] ; then
     echo "obtaining results"
     source ~soft_bio_267/initializes/init_python
