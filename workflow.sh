@@ -1,4 +1,4 @@
-%launch_RARE_[baseline;justnet;justcom;juststr;netcom;new_tanimoto]){
+launch_RARE_[baseline;justnet;justcom;juststr;netcom;new_tanimoto]){
 	resources: -c 20 -m 100gb -A exclusive
 	source ~soft_bio_267/initializes/init_python
 	export PATH=$code_path:$PATH
@@ -25,28 +25,8 @@
 		r=0
 		m=0
 		t=0
-	elif [ "(*)" == "ori_tanimoto" ] ; then
-		r="0.25"
-		m=1
-		t=4
-	elif [ "(*)" == "ori_louvain" ] ; then
-		r="0.25"
-		m=1
-		t=4
 	elif [ "(*)" == "new_tanimoto" ] ; then
 		r="0.25"
-		m=1
-		t=0
-	elif [ "(*)" == "new_louvain" ] ; then
-		r="0.25"
-		m=1
-		t=0
-	elif [ "(*)" == "custom_1" ] ; then
-		r="0.5"
-		m=1
-		t=0
-	elif [ "(*)" == "custom_2" ] ; then
-		r="0.75"
 		m=1
 		t=0
 	fi
@@ -60,7 +40,7 @@
 	fi
 }
 
-%get_spearman_corr){
+get_spearman_corr){
 	resources: -c 20 -m 20gb -A exclusive
 	source ~soft_bio_267/initializes/init_python
 	export PATH=$template:$PATH
