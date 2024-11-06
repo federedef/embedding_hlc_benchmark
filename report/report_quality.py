@@ -41,8 +41,10 @@ quality_metrics = open_metrics(opts.quality_metrics)
 relative_pos = open_metrics(opts.relative_pos)
 
 n=20
-quality_metrics = [row for row in quality_metrics if float(row[4])>4 and float(row[5])>0]
+quality_metrics = [row for row in quality_metrics if float(row[4])>4 and float(row[5])>0 and row[0] in ["baseline","justnet","justcom","netcom"]]
 relative_pos = [row for row in relative_pos if float(row[4])>4 and float(row[5])>0]
+#quality_metrics = [row for row in quality_metrics]
+#relative_pos = [row for row in relative_pos]
 # new_quality_metrics = []
 # for row in quality_metrics:
 #     for i in range(int(row[4])):

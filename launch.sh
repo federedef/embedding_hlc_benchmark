@@ -60,7 +60,7 @@ if [ "$1" == "wf" ] ; then
           \\$input_path=$INPUT_PATH,
           \\$template=$REPORT_PATH,
           \\$code_path=$CODE_PATH,
-          \\$external_path=$INPUT_PATH/externals/${dataset}_buphamalai,
+          \\$external_path=$INPUT_PATH/externals/${dataset},
           \\$scripts_code=$INITIAL_PATH/scripts
         " | tr -d [:space:]`
         AutoFlow -e -w ./workflow.sh -V $variables -o $EXEC_PATH/$dataset -m 20gb -t 3-00:00:00 -n cal -s 3 

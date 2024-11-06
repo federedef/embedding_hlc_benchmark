@@ -8,10 +8,10 @@
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[4,2], title= "(C) Mean distance vs group size", 
 			x_label= "Group size", y_label= "Mean distance (normalized)", add_densities=True,
-		 smp_attr= [0,1,8], config={"colorBy": "execution_type",
+		 smp_attr= [0,1,8], config={"colorBy": "execution_type", 
 		 "hoverTemplate": """Diam: {diam}"""})}
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[4,3],  title= "(D) Median distance vs group size", 
-			x_label= "Group size", y_label= "Median distance (normalized)", add_densities=True,
+			x_label= "Group size", y_label= "Median distance (normalized)", add_densities=True, 
 		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
 </div>
 
@@ -45,12 +45,13 @@
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[5,2], title= "(E) Mean distance vs group diameter", 
-			x_label= "Internal Edge density", y_label= "Mean distance (normalized)",add_densities=True,
-		 smp_attr= [0,1,4,5], config={"colorBy": "execution_type",
-		 "hoverTemplate": """Diam: {diam} <br> size:{size}"""})}
+			x_label= "Internal Edge density", y_label= "Mean distance (normalized)",
+		 smp_attr= [0,1,4,5], config={"colorBy": "execution_type", "objectColorTransparency": 0.2,"objectBorderColor": "#ffffff",
+		 "hoverTemplate": """Diam: {diam} <br> size:{size}""","showRegressionFit":"execution_type", "showRegressionFullRange":True})}
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[5,3],  title= "(F) Median distance vs group diameter", 
-			x_label= "Internal Edge density", y_label= "Median distance (normalized)",add_densities=True,
-		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+			x_label= "Internal Edge density", y_label= "Median distance (normalized)",
+		 smp_attr= [0,1], config={"colorBy": "execution_type", "objectColorTransparency": 0.2, "objectBorderColor": "#ffffff",
+		 "hoverTemplate": """Diam: {diam} <br> size:{size}""","showRegressionFit":"execution_type", "showRegressionFullRange":True})}
 </div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">

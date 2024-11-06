@@ -1,4 +1,4 @@
-launch_RARE_[baseline;justnet;justcom;juststr;netcom;new_tanimoto]){
+%launch_RARE_[baseline;justnet;justcom;juststr;netcom;new_tanimoto]){
 	resources: -c 20 -m 100gb -A exclusive
 	source ~soft_bio_267/initializes/init_python
 	export PATH=$code_path:$PATH
@@ -40,7 +40,7 @@ launch_RARE_[baseline;justnet;justcom;juststr;netcom;new_tanimoto]){
 	fi
 }
 
-get_spearman_corr){
+%get_spearman_corr){
 	resources: -c 20 -m 20gb -A exclusive
 	source ~soft_bio_267/initializes/init_python
 	export PATH=$template:$PATH
@@ -53,7 +53,7 @@ get_spearman_corr){
 	report_corr.py -R launch_RARE_justcom)/embedding_matrix.npy -G launch_RARE_justcom)/embedding_matrix.npy -r launch_RARE_justcom)/embedding_matrix.lst -g launch_RARE_justcom)/embedding_matrix.lst -t $template/corr.txt -o "justcom_justcom_$dataset"
 }
 
-get_quality_from_external_[baseline;justnet;justcom;juststr;netcom;new_tanimoto]){
+%get_quality_from_external_[baseline;justnet;justcom;juststr;netcom;new_tanimoto]){
 	resources: -c 20 -m 50gb -A exclusive
 	source ~soft_bio_267/initializes/init_python
 	source ~/dev_py/myenv/bin/activate
