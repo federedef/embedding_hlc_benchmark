@@ -1,9 +1,9 @@
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.boxplot(id = 'quality_metrics', row_names= False, header=True, title= "(A) Mean distance between groups", x_label= "Mean distance (normalized)",
-			fields=[2], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"], "colorBy": "execution_type"})}
+			fields=[2], smp_attr= [0], group="Implementation", config={"groupingFactors": ["Implementation"], "showViolinBoxplot":True, "colorBy": "Implementation"})}
 		${plotter.boxplot(id = 'quality_metrics', row_names= False, header=True, title= "(B) Median distance between groups", x_label= "Median distance (normalized)",
- 		fields=[3], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"],
- 		 "colorBy": "execution_type"})}
+ 		fields=[3], smp_attr= [0], group="Implementation", config={"groupingFactors": ["Implementation"], "showViolinBoxplot":True,
+ 		 "colorBy": "Implementation"})}
 </div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
@@ -21,45 +21,45 @@
 	<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"External group in {alg_type} embedding", 
 			x_label= "UMAP-1", y_label= "UMAP-2",
-		 smp_attr= [0], config={"colorBy": "external_group", "dataPointSize": 5, "showLegend":False,
+		 smp_attr= [6], config={"colorBy": "Reactome Pathway Description", "dataPointSize": 5, "showLegend":True,
 		  "objectBorderColor": "#ffffff", "colorScheme": "Tableau"})}
 		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"HLC communities in {alg_type} embedding", 
 			x_label= "UMAP-1", y_label= "UMAP-2",
-		 smp_attr= [1], config={"colorBy": "hlc_comm", "dataPointSize": 4, "objectBorderColor": "#ffffff", "showLegend":False,
+		 smp_attr= [1], config={"colorBy": "HLC cluster", "dataPointSize": 4, "objectBorderColor": "#ffffff", "showLegend":False,
 		  "colorScheme": "Tableau"})}
 		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"Louvain communities for {alg_type} embbeding", 
 			x_label= "UMAP-1", y_label= "UMAP-2",
-		 smp_attr= [2], config={"colorBy": "Lou_comm", "dataPointSize": 3,"objectBorderColor": "#ffffff", "showLegend":False,
+		 smp_attr= [2], config={"colorBy": "HLC cluster", "dataPointSize": 3,"objectBorderColor": "#ffffff", "showLegend":False,
 		 "colorScheme": "Tableau"})}
 	</div>
 % endfor
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 ${plotter.scatter2D(id = 'hlcgroup2size', header=False, fields=[1], title= "Size distribution in HLC clustering", 
-			x_label= "Cluster Size", y_label= "Number of clusters", config={"showHistogram": True,"histogramBins":10})}
+			x_label= "Cluster Size", y_label= "Number of clusters", config={"showHistogram": True,"histogramBins":10, "showLegend":False})}
 ${plotter.scatter2D(id = 'louvaingroup2size', header=False, fields=[1], title= "Size distribution in Louvain clustering", 
-			x_label= "Cluster Size", y_label= "Number of clusters", config={"showHistogram": True,"histogramBins":10})}
+			x_label= "Cluster Size", y_label= "Number of clusters", config={"showHistogram": True,"histogramBins":10, "showLegend":False})}
 </div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[4,2], title= "(C) Mean distance vs group size", 
 			x_label= "Group size", y_label= "Mean distance (normalized)", add_densities=True,
-		 smp_attr= [0,1,8], config={"colorBy": "execution_type", 
+		 smp_attr= [0,1,8], config={"colorBy": "Implementation", 
 		 "hoverTemplate": """Diam: {diam}"""})}
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[4,3],  title= "(D) Median distance vs group size", 
 			x_label= "Group size", y_label= "Median distance (normalized)", add_densities=True, 
-		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+		 smp_attr= [0,1], config={"colorBy": "Implementation"})}
 </div>
 
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[8,2], title= "(E) Mean distance vs group diameter", 
 			x_label= "Diam Group", y_label= "Mean distance (normalized)",
-		 smp_attr= [0,1,5], config={"colorBy": "execution_type",
+		 smp_attr= [0,1,5], config={"colorBy": "Implementation",
 		 "hoverTemplate": """Diam: {diam}"""})}
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[8,3],  title= "(F) Median distance vs group diameter", 
 			x_label= "Diam Group", y_label= "Median distance (normalized)",
-		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+		 smp_attr= [0,1], config={"colorBy": "Implementation"})}
 </div>
 
 
@@ -80,75 +80,56 @@ ${plotter.scatter2D(id = 'louvaingroup2size', header=False, fields=[1], title= "
 
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
-		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[5,2], title= "(E) Mean distance vs group diameter", 
+		${plotter.scatter2D(id = 'all_quality_metrics', header=True, fields=[5,2], title= "(E) Mean distance vs group diameter", 
 			x_label= "Internal Edge density", y_label= "Mean distance (normalized)",
-		 smp_attr= [0,1,4,5], config={"colorBy": "execution_type", "objectColorTransparency": 0.2,"objectBorderColor": "#ffffff",
-		 "hoverTemplate": """Diam: {diam} <br> size:{size}""","showRegressionFit":"execution_type", "showRegressionFullRange":True})}
-		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[5,3],  title= "(F) Median distance vs group diameter", 
+		 smp_attr= [0,1,4,5], config={"colorBy": "Implementation", "objectColorTransparency": 0.2,"objectBorderColor": "#ffffff",
+		 "hoverTemplate": """Diam: {diam} <br> size:{size}""","showRegressionFit":"Implementation", "showRegressionFullRange":True, "colorScheme": "Tableau"})}
+		${plotter.scatter2D(id = 'all_quality_metrics', header=True, fields=[5,3],  title= "(F) Median distance vs group diameter", 
 			x_label= "Internal Edge density", y_label= "Median distance (normalized)",
-		 smp_attr= [0,1], config={"colorBy": "execution_type", "objectColorTransparency": 0.2, "objectBorderColor": "#ffffff",
-		 "hoverTemplate": """Diam: {diam} <br> size:{size}""","showRegressionFit":"execution_type", "showRegressionFullRange":True})}
+		 smp_attr= [0,1], config={"colorBy": "Implementation", "objectColorTransparency": 0.2, "objectBorderColor": "#ffffff",
+		 "hoverTemplate": """Diam: {diam} <br> size:{size}""","showRegressionFit":"Implementation", "showRegressionFullRange":True, "colorScheme": "Tableau"})}
 </div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[6,2], title= "(E) Mean distance vs group diameter", 
 			x_label= "Triangle Partition Ratio", y_label= "Mean distance (normalized)",add_densities=True,
-		 smp_attr= [0,1,5], config={"colorBy": "execution_type",
+		 smp_attr= [0,1,5], config={"colorBy": "Implementation",
 		 "hoverTemplate": """Diam: {diam}"""})}
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[6,3],  title= "(F) Median distance vs group diameter", 
 			x_label= "Triangle Partition Ratio", y_label= "Median distance (normalized)",add_densities=True,
-		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+		 smp_attr= [0,1], config={"colorBy": "Implementation"})}
 </div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[7,2], title= "(E) Mean distance vs group diameter", 
 			x_label= "CR", y_label= "Mean distance (normalized)",add_densities=True,
-		 smp_attr= [0,1,5], config={"colorBy": "execution_type",
+		 smp_attr= [0,1,5], config={"colorBy": "Implementation",
 		 "hoverTemplate": """Diam: {diam}"""})}
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[7,3],  title= "(F) Median distance vs group diameter", 
 			x_label= "CR", y_label= "Median distance (normalized)",add_densities=True,
-		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+		 smp_attr= [0,1], config={"colorBy": "Implementation"})}
 </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
-		${plotter.boxplot(id = 'relative_metrics', row_names= False, header=True, title= "(A) Mean distance between groups", x_label= "Mean distance (normalized)",
-			fields=[2], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"], "colorBy": "execution_type"})}
-		${plotter.boxplot(id = 'relative_metrics', row_names= False, header=True, title= "(B) Median distance between groups", x_label= "Median distance (normalized)",
- 		fields=[3], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"],
- 		 "colorBy": "execution_type"})}
-</div>
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'relative_metrics', header=True, fields=[4,2], title= "(C) Mean distance vs group size", 
 			x_label= "Group size", y_label= "Mean distance (normalized)",
-		 smp_attr= [0,1,8], config={"colorBy": "execution_type",
+		 smp_attr= [0,1,8], config={"colorBy": "Implementation",
 		 "hoverTemplate": """Diam: {diam}"""})}
 		${plotter.scatter2D(id = 'relative_metrics', header=True, fields=[4,3],  title= "(D) Median distance vs group size", 
 			x_label= "Group size", y_label= "Median distance (normalized)",
-		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+		 smp_attr= [0,1], config={"colorBy": "Implementation"})}
 </div>
 
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'relative_metrics', header=True, fields=[8,2], title= "(E) Mean distance vs group diameter", 
 			x_label= "Diam Group", y_label= "Mean distance (normalized)",
-		 smp_attr= [0,1,5], config={"colorBy": "execution_type",
+		 smp_attr= [0,1,5], config={"colorBy": "Implementation",
 		 "hoverTemplate": """Diam: {diam}"""})}
 		${plotter.scatter2D(id = 'relative_metrics', header=True, fields=[8,3],  title= "(F) Median distance vs group diameter", 
 			x_label= "Diam Group", y_label= "Median distance (normalized)",
-		 smp_attr= [0,1], config={"colorBy": "execution_type"})}
+		 smp_attr= [0,1], config={"colorBy": "Implementation"})}
 </div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">

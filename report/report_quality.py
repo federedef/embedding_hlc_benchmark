@@ -6,6 +6,7 @@ from collections import defaultdict
 from py_report_html import Py_report_html
 import py_exp_calc.exp_calc as pxc
 import umap
+import copy 
 
 ##############################################################################################
 ## METHODS
@@ -32,7 +33,7 @@ def quality_test(quality_metrics, alternative):
     quality_tests.insert(0, ["Method 1", "Method 2", "variable","p-value", "adjusted p-value"])
     return quality_tests
 
-def get_umap_with_labels(embedding_npy, embedding_node_names, node2external_group, node2HLCcommunity, node2Loucommunity, random_seed=123):
+def get_umap_with_labels(embedding_npy, embedding_node_names, node2external_group, node2HLCcommunity, node2Loucommunity, ext_groups_description, random_seed=123):
     print("Starting UMAP transformation...")
     print(f"Embedding shape: {embedding_npy.shape}")
     print(f"Number of gene names: {len(embedding_node_names)}")
@@ -47,7 +48,8 @@ def get_umap_with_labels(embedding_npy, embedding_node_names, node2external_grou
         community_HLC = node2HLCcommunity.get(str(node), "background")
         community_Lou = node2Loucommunity.get(str(node), "background")
         pos1, pos2 = umap_coords[i]
-        table.append([external_group, "cluster-"+community_HLC, "cluster-"+community_Lou, str(node), str(pos1), str(pos2)])
+        ext_group_description = ext_groups_description.get(external_group, "background")
+        table.append([external_group, "cluster-"+community_HLC, "cluster-"+community_Lou, str(node), str(pos1), str(pos2), ext_group_description])
     
     return table
 
@@ -77,6 +79,10 @@ def open_groups(path2groups, top=11, group_col= 0, node_col = 1, sep = "\t"):
             node2group[node] = group
     return node2group, [[group, size] for group, size in group2size.items()]
 
+def parse_methods(table, method_parser, col_i = 0):
+    for row in table:
+        row[col_i] = method_parser[row[col_i]]
+
 ##############################################################################################
 ## OPTPARSE
 ##############################################################################################
@@ -91,6 +97,7 @@ parser.add_argument("--communities", dest="communities", default=None, type = la
 parser.add_argument("--external_groups", dest="external_groups", default=None, help="")
 parser.add_argument("-t", "--template", dest="template", default=None,
     help="Template")
+parser.add_argument("--external_group_description", default= None, dest="external_group_description", help="a table with the first column the name of the external group and second column its description")
 parser.add_argument("-o", "--output", dest="output", default=None,
     help="output name")
 opts = parser.parse_args()
@@ -101,6 +108,22 @@ opts = parser.parse_args()
 quality_metrics = open_metrics(opts.quality_metrics)
 relative_pos = open_metrics(opts.relative_pos)
 node2external_group, _ = open_groups(opts.external_groups)
+parse_names = { "baseline": "baseline",
+                "justnet":"neigh",
+                "justcom":"HLCcomm",
+                "netcom":"neigh-HLCcomm",
+                "justcom_lou":"Louvaincomm",
+                "netcom_lou":"neigh-Louvaincomm"}
+
+all_groups = []
+for groups in node2external_group.values():
+    for group in groups:
+        all_groups.append(group)
+all_groups = sorted(list(set(all_groups)))
+if not opts.external_group_description:
+    ext_groups_description = {group: group for group in all_groups}
+ext_groups_description = {group: description for group, description in open_metrics(opts.external_group_description)}
+
 node2HLCcommunity, hlcgroup2size = open_groups(opts.communities["HLC"],top=20)
 node2Loucommunity, louvaingroup2size = open_groups(opts.communities["Louvain"],top=20)
 
@@ -108,28 +131,27 @@ alg_type2table = {}
 for alg_type, emb_pos_data in opts.emb_pos.items():
     embedding_npy = np.load(emb_pos_data+".npy")
     embedding_pos = [row[0] for row in open_metrics(emb_pos_data+".lst")]
-    embedding_table = get_umap_with_labels(embedding_npy, embedding_pos, node2external_group, node2HLCcommunity, node2Loucommunity, random_seed = 123)
-    embedding_table.insert(0, ["external_group","hlc_comm","Lou_comm","node","dim1","dim2"])
+    embedding_table = get_umap_with_labels(embedding_npy, embedding_pos, node2external_group, node2HLCcommunity, node2Loucommunity, ext_groups_description, random_seed = 123)
+    embedding_table.insert(0, ["Reactome Pathway","HLC cluster","Louvain cluster","node","dim1","dim2", "Reactome Pathway Description"])
     alg_type2table[alg_type] = embedding_table
 
-#n=20 >0.75 
+all_quality_metrics = [row for row in quality_metrics if float(row[4])>4]
+all_quality_metrics = copy.deepcopy(all_quality_metrics)
 quality_metrics = [row for row in quality_metrics if float(row[4])>4 and float(row[5])>0.75 and row[0] in ["baseline","justnet","justcom","netcom","justcom_lou","netcom_lou"]]
-relative_pos = [row for row in relative_pos if float(row[4])>4 and float(row[5])>0]
+relative_pos = [row for row in relative_pos if float(row[4])>4 and float(row[5])>0.75]
 greater_quality_tests = quality_test(quality_metrics, "greater")
 less_quality_tests = quality_test(quality_metrics,"less")
-quality_metrics.insert(0, ["execution_type","group","mean","median","size","ied", "tpr", "cr", "diam"])
-relative_pos.insert(0, ["execution_type","group","mean","median","size","ied", "tpr", "cr", "diam"])
-#print(quality_metrics)
-#quality_metrics = [row for row in quality_metrics]
-#relative_pos = [row for row in relative_pos]
-# new_quality_metrics = []
-# for row in quality_metrics:
-#     for i in range(int(row[4])):
-#         idx=f"{row[1]}_{i}"
-#         new_quality_metrics.append([row[0],idx,row[2],row[3],row[4],row[5]])
-# quality_metrics = new_quality_metrics
+
+parse_methods(all_quality_metrics, parse_names)
+parse_methods(quality_metrics, parse_names)
+parse_methods(relative_pos, parse_names)
+
+all_quality_metrics.insert(0, ["Implementation","group","mean","median","size","ied", "tpr", "cr", "diam"])
+quality_metrics.insert(0, ["Implementation","group","mean","median","size","ied", "tpr", "cr", "diam"])
+relative_pos.insert(0, ["Implementation","group","mean","median","size","ied", "tpr", "cr", "diam"])
 
 container = {
+    'all_quality_metrics': all_quality_metrics,
     'quality_metrics': quality_metrics,
     'relative_metrics': relative_pos,
     'greater_quality_tests': greater_quality_tests,

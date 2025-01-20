@@ -99,7 +99,8 @@ report_quality){
 		report_quality.py -r relative_quality_metrics -i quality_metrics -t $template/quality.txt \
 		--emb_pos `cat emb_data` \
 		--communities "HLC;$input_path/clusters/$dataset,Louvain;$input_path/clusters/louvain_$dataset" \
-		--external_groups $external_path -o "quality_metrics_$dataset"
+		--external_groups $external_path -o "quality_metrics_$dataset" \
+		--external_group_description "$external2description_path"
 	fi
 }
 
