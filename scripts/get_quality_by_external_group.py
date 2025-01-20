@@ -91,7 +91,7 @@ lst = open_lst(opts.lst)
 lst2position = {n: p for p, n in enumerate(lst)}
 position2lst ={p: n for p, n in enumerate(lst)}
 ext_groups = get_external_groups(opts.external_groups)
-G = read_graph(opts.input, " ")
+G = read_graph(opts.input, "\t")
 
 group2metric = {name: get_cluster_metrics(nodes, G) for name, nodes in ext_groups.items()}
 # get distance

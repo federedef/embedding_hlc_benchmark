@@ -5,6 +5,42 @@
  		fields=[3], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"],
  		 "colorBy": "execution_type"})}
 </div>
+
+<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
+ ${plotter.table(id='greater_quality_tests', header=True, title="H1: Method 1 > Method2", row_names = False, fields= [0,1,3,4], styled='dt', border= 2, attrib = {
+                                'class' : "table table-striped table-dark"})}
+ ${plotter.table(id='less_quality_tests', header=True, title="H1: Method 1 < Method2", row_names = False, fields= [0,1,3,4], styled='dt', border= 2, attrib = {
+                                'class' : "table table-striped table-dark"})}
+</div>
+
+
+% for alg_type, embedding_table in plotter.hash_vars["alg_type2embtable"].items():
+	<%
+	plotter.hash_vars['embedding_table'] = embedding_table
+	%>
+	<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
+		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"External group in {alg_type} embedding", 
+			x_label= "UMAP-1", y_label= "UMAP-2",
+		 smp_attr= [0], config={"colorBy": "external_group", "dataPointSize": 5, "showLegend":False,
+		  "objectBorderColor": "#ffffff", "colorScheme": "Tableau"})}
+		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"HLC communities in {alg_type} embedding", 
+			x_label= "UMAP-1", y_label= "UMAP-2",
+		 smp_attr= [1], config={"colorBy": "hlc_comm", "dataPointSize": 4, "objectBorderColor": "#ffffff", "showLegend":False,
+		  "colorScheme": "Tableau"})}
+		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"Louvain communities for {alg_type} embbeding", 
+			x_label= "UMAP-1", y_label= "UMAP-2",
+		 smp_attr= [2], config={"colorBy": "Lou_comm", "dataPointSize": 3,"objectBorderColor": "#ffffff", "showLegend":False,
+		 "colorScheme": "Tableau"})}
+	</div>
+% endfor
+
+<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
+${plotter.scatter2D(id = 'hlcgroup2size', header=False, fields=[1], title= "Size distribution in HLC clustering", 
+			x_label= "Cluster Size", y_label= "Number of clusters", config={"showHistogram": True,"histogramBins":10})}
+${plotter.scatter2D(id = 'louvaingroup2size', header=False, fields=[1], title= "Size distribution in Louvain clustering", 
+			x_label= "Cluster Size", y_label= "Number of clusters", config={"showHistogram": True,"histogramBins":10})}
+</div>
+
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'quality_metrics', header=True, fields=[4,2], title= "(C) Mean distance vs group size", 
 			x_label= "Group size", y_label= "Mean distance (normalized)", add_densities=True,
