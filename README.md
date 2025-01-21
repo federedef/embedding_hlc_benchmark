@@ -1,4 +1,4 @@
-# Workflow Automation Script
+# Automatic Workflow: HLC embedding benchmarking
 
 This repository contains a Bash script for managing datasets, running workflows, and obtaining results in a benchmarking for hlc embedding. The script supports dataset preparation, workflow execution, result collection, and pipeline recovery.
 
