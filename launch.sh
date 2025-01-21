@@ -5,47 +5,51 @@ mkdir -p $EXEC_PATH
 export INITIAL_PATH=`pwd`
 export INPUT_PATH=$INITIAL_PATH/dataset
 export REPORT_PATH=$INITIAL_PATH/report
+EDGES_PATH=~/projects/network_hlc_benchmark/dataset
+HLC_CLUSTER_PATH=$FSCRATCH/network_hlc_benchmark
 datasets="human_STRING_900 human_STRING_700"
-#datasets="human_STRING_700"
 
 
 if [ "$1" == "d" ] ; then
     # Preparing the datasets
     source ~soft_bio_267/initializes/init_python
-    # # get datasets
-    # for dataset in $datasets ; do
-    #     cp ~/projects/network_hlc_benchmark/dataset/$dataset ./dataset/edges/
-    # done
-    # # create translators
-    # for dataset in $datasets ; do
-    #     cut -f 1 ./dataset/edges/$dataset > tmp && cut -f 2 ./dataset/edges/$dataset >> tmp
-    #     sort tmp | uniq | awk 'BEGIN{OFS="\t"}{print $1,NR}' > ./dataset/translators/$dataset
-    #     rm tmp
-    # done
-    #get communities HLC
-    # for dataset in $datasets ; do
-    #     echo "$dataset"
-    #     cp $FSCRATCH/network_hlc_benchmark/$dataset/test.py_0000/formated_cls ./dataset/clusters/
-    #     awk 'BEGIN{OFS=" "}{print $2,$1}' ./dataset/clusters/formated_cls > ./dataset/clusters/$dataset
-    #     rm ./dataset/clusters/formated_cls 
-    # done
 
-    # # get communities louvain
-    # for dataset in $datasets ; do
-    #     netanalyzer -i ./dataset/edges/$dataset -f "pair" -b "louvain" -s " " --output_build_clusters "./dataset/clusters/tmp_louvain_$dataset"
-    #     awk 'BEGIN{OFS=" "}{print $2,$1}' ./dataset/clusters/tmp_louvain_$dataset > ./dataset/clusters/"louvain_$dataset"
-    #     rm ./dataset/clusters/tmp_louvain_$dataset
-    # done
+    # get datasets
+    for dataset in $datasets ; do
+        cp $EDGES_PATH/$dataset ./dataset/edges/
+    done
+    
+    # create translators
+    for dataset in $datasets ; do
+        cut -f 1 ./dataset/edges/$dataset > tmp && cut -f 2 ./dataset/edges/$dataset >> tmp
+        sort tmp | uniq | awk 'BEGIN{OFS="\t"}{print $1,NR}' > ./dataset/translators/$dataset
+        rm tmp
+    done
+    
+    # get communities HLC
+    for dataset in $datasets ; do
+        echo "$dataset"
+        cp $HLC_CLUSTER_PATH/$dataset/test.py_0000/formated_cls ./dataset/clusters/
+        awk 'BEGIN{OFS=" "}{print $2,$1}' ./dataset/clusters/formated_cls > ./dataset/clusters/$dataset
+        rm ./dataset/clusters/formated_cls 
+    done
+
+    # get communities louvain
+    for dataset in $datasets ; do
+        netanalyzer -i ./dataset/edges/$dataset -f "pair" -b "louvain" -s " " --output_build_clusters "./dataset/clusters/tmp_louvain_$dataset"
+        awk 'BEGIN{OFS=" "}{print $2,$1}' ./dataset/clusters/tmp_louvain_$dataset > ./dataset/clusters/"louvain_$dataset"
+        rm ./dataset/clusters/tmp_louvain_$dataset
+    done
 
     # translate datasets and communities
-    # for dataset in $datasets ; do
-        #sed -i "s/\t/ /g" ./dataset/edges/$dataset
-        #standard_name_replacer -i ./dataset/edges/$dataset -I ./dataset/translators/$dataset -c 1,2 -u -s " " > tmp && mv tmp ./dataset/edges/$dataset
-    #     standard_name_replacer -i ./dataset/clusters/$dataset -I ./dataset/translators/$dataset -s " " -c 1 -u > tmp && mv tmp ./dataset/clusters/$dataset
-    # done
+    for dataset in $datasets ; do
+        sed -i "s/\t/ /g" ./dataset/edges/$dataset
+        standard_name_replacer -i ./dataset/edges/$dataset -I ./dataset/translators/$dataset -c 1,2 -u -s " " > tmp && mv tmp ./dataset/edges/$dataset
+        standard_name_replacer -i ./dataset/clusters/$dataset -I ./dataset/translators/$dataset -s " " -c 1 -u > tmp && mv tmp ./dataset/clusters/$dataset
+    done
 
     # get externals
-    # wget https://reactome.org/download/current/Ensembl2Reactome.txt -O ./dataset/externals/reactome
+    wget https://reactome.org/download/current/Ensembl2Reactome.txt -O ./dataset/externals/reactome
     grep "ENSP" ./dataset/externals/reactome | grep "Homo sapiens" | cut -f 2,4 | sort | uniq > ./dataset/externals/reactome2description
     for protein in "human_STRING_700" "human_STRING_900" ; do
         #sed "s/9606.ENS/ENS/g" ./dataset/translators/"$protein" > tmp && mv tmp ./dataset/translators/"$protein"
@@ -54,14 +58,12 @@ if [ "$1" == "d" ] ; then
         cp ./dataset/externals/reactome2description ./dataset/externals/${protein}_external2description
     done
 
-
     # get reactome2description
-
-    # for protein in "human_STRING_700" "human_STRING_900" ; do
-    #     echo "$protein"
-    #     standard_name_replacer -i ./dataset/externals/zampieri -I ./dataset/translators/"$protein" -c 2 -u > ./dataset/externals/"$protein"_zampieri
-    #     standard_name_replacer -i ./dataset/externals/buphamalai -I ./dataset/translators/"$protein" -c 2 -u > ./dataset/externals/"$protein"_buphamalai
-    # done
+    for protein in "human_STRING_700" "human_STRING_900" ; do
+        echo "$protein"
+        standard_name_replacer -i ./dataset/externals/zampieri -I ./dataset/translators/"$protein" -c 2 -u > ./dataset/externals/"$protein"_zampieri
+        standard_name_replacer -i ./dataset/externals/buphamalai -I ./dataset/translators/"$protein" -c 2 -u > ./dataset/externals/"$protein"_buphamalai
+    done
 fi
 
 if [ "$1" == "wf" ] ; then
@@ -85,7 +87,6 @@ if [ "$1" == "r" ] ; then
     echo "obtaining results"
     source ~soft_bio_267/initializes/init_python
     echo $EXEC_PATH
-    #export EXEC_PATH=$FSCRATCH/custom_random
     mkdir -p results
     for dataset in $datasets ; do
         for report in `find $EXEC_PATH/$dataset -type f -name "*.html" -printf "%p\n"`; do

@@ -1,6 +1,6 @@
 # Workflow Automation Script
 
-This repository contains a Bash script for managing datasets, running workflows, and obtaining results in a computational pipeline. The script supports dataset preparation, workflow execution, result collection, and pipeline recovery for bioinformatics projects.
+This repository contains a Bash script for managing datasets, running workflows, and obtaining results in a benchmarking for hlc embedding. The script supports dataset preparation, workflow execution, result collection, and pipeline recovery.
 
 ## Features
 
@@ -67,12 +67,14 @@ The script accepts the following arguments to specify the operation mode:
 - `CODE_PATH`: Path to the code directory.
 - `INPUT_PATH`: Path to the input datasets.
 - `REPORT_PATH`: Path for saving reports.
+- `EDGES_PATH`: Path for networks.
+- `HLC_CLUSTER_PATH`: Path for hlc clustering for each network.
 
 ### Supported Datasets
 
 By default, the script works with:
-- `human_STRING_900`
-- `human_STRING_700`
+- `human_STRING_900`: The human interactome from STRING database with a cutoff of 900.
+- `human_STRING_700`: The human interactome from STRING database with a cutoff of 700.
 
 You can modify the `datasets` variable to include additional datasets.
 
