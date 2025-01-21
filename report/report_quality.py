@@ -20,7 +20,7 @@ def open_metrics(path):
             metrics.append(line)
     return metrics
 
-def quality_test(quality_metrics, alternative):
+def quality_test(quality_metrics, alternative, method_parser=None):
     # alternative: greater, less, both
     idx_factor = [0]   
     adj_pval = "fdr_bh"  
@@ -28,7 +28,10 @@ def quality_test(quality_metrics, alternative):
     quality_tests = pxc.get_test([[row[0],float(row[2])] for row in quality_metrics ], 
                                     idx_factor, alternative, adj_pval, assumptions, 
                                     header=False, parametric = True)
+
     quality_tests = [[row[0].replace("F1_", "").split(":")[0],row[0].replace("F1_", "").split(":")[1],*row[1:]] for row in quality_tests]
+    if method_parser:
+        quality_tests = [[method_parser[row[0]],method_parser[row[1]],*row[2:]] for row in quality_tests]
     #quality_tests = [row for row in quality_tests if row[0] == "netcom_lou" or row[1] == "netcom_lou"]
     quality_tests.insert(0, ["Method 1", "Method 2", "variable","p-value", "adjusted p-value"])
     return quality_tests
@@ -139,8 +142,9 @@ all_quality_metrics = [row for row in quality_metrics if float(row[4])>4]
 all_quality_metrics = copy.deepcopy(all_quality_metrics)
 quality_metrics = [row for row in quality_metrics if float(row[4])>4 and float(row[5])>0.75 and row[0] in ["baseline","justnet","justcom","netcom","justcom_lou","netcom_lou"]]
 relative_pos = [row for row in relative_pos if float(row[4])>4 and float(row[5])>0.75]
-greater_quality_tests = quality_test(quality_metrics, "greater")
-less_quality_tests = quality_test(quality_metrics,"less")
+
+greater_quality_tests = quality_test(quality_metrics, "greater", parse_names)
+less_quality_tests = quality_test(quality_metrics,"less", parse_names)
 
 parse_methods(all_quality_metrics, parse_names)
 parse_methods(quality_metrics, parse_names)

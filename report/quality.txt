@@ -25,11 +25,11 @@
 		  "objectBorderColor": "#ffffff", "colorScheme": "Tableau"})}
 		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"HLC communities in {alg_type} embedding", 
 			x_label= "UMAP-1", y_label= "UMAP-2",
-		 smp_attr= [1], config={"colorBy": "HLC cluster", "dataPointSize": 4, "objectBorderColor": "#ffffff", "showLegend":False,
+		 smp_attr= [1], config={"colorBy": "HLC cluster", "dataPointSize": 5, "objectBorderColor": "#ffffff", "showLegend":True,
 		  "colorScheme": "Tableau"})}
 		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"Louvain communities for {alg_type} embbeding", 
 			x_label= "UMAP-1", y_label= "UMAP-2",
-		 smp_attr= [2], config={"colorBy": "HLC cluster", "dataPointSize": 3,"objectBorderColor": "#ffffff", "showLegend":False,
+		 smp_attr= [2], config={"colorBy": "Louvain cluster", "dataPointSize": 5,"objectBorderColor": "#ffffff", "showLegend":True,
 		 "colorScheme": "Tableau"})}
 	</div>
 % endfor
