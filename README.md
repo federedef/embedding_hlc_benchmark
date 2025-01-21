@@ -13,7 +13,7 @@ This repository contains a Bash script for managing datasets, running workflows,
 
 - **Environment Setup**:
   - The script depends on specific initialization files (`~soft_bio_267/initializes/init_python` and `~soft_bio_267/initializes/init_autoflow`).
-  - Ensure the required environment variables and software tools (`standard_name_replacer`, `netanalyzer`, `AutoFlow`, `flow_logger`) are available.
+  - Ensure the required environment variables and software tools (python library: `py_cmdtabs`, `netanalyzer`, ruby gem: `AutoFlow`) are available.
 - **Datasets**:
   - Input datasets must be located or prepared as per the defined paths in the script.
 
