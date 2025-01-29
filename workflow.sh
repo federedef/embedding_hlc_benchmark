@@ -72,7 +72,6 @@ get_quality_from_external_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lo
 
 report_quality){
 	source ~soft_bio_267/initializes/init_python
-	source ~/dev_py/myenv/bin/activate
 	PATH=$template:$PATH
 	cat !get_quality_from_external_!/final_quality_metrics > quality_metrics
 	cat !get_quality_from_external_!/final_relative_quality_metrics > relative_quality_metrics
