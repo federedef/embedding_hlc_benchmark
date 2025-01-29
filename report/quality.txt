@@ -1,9 +1,22 @@
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.boxplot(id = 'quality_metrics', row_names= False, header=True, title= "(A) Mean distance between groups", x_label= "Mean distance (normalized)",
-			fields=[2], smp_attr= [0], group="Implementation", config={"groupingFactors": ["Implementation"], "showViolinBoxplot":True, "colorBy": "Implementation"})}
+			fields=[2], height=250, width=500, smp_attr= [0], group="Implementation", config={"groupingFactors": ["Implementation"], 
+			"showViolinBoxplot":True, "colorBy": "Implementation", "xAxisTextScaleFontFactor":1.3, 'smpTextScaleFontFactor':1.3})}
 		${plotter.boxplot(id = 'quality_metrics', row_names= False, header=True, title= "(B) Median distance between groups", x_label= "Median distance (normalized)",
- 		fields=[3], smp_attr= [0], group="Implementation", config={"groupingFactors": ["Implementation"], "showViolinBoxplot":True,
- 		 "colorBy": "Implementation"})}
+ 		fields=[3], height=250, width=500, smp_attr= [0], group="Implementation", config={"groupingFactors": ["Implementation"], "showViolinBoxplot":True,
+ 		 "colorBy": "Implementation", "xAxisTextScaleFontFactor":1.3, 'smpTextScaleFontFactor':1.3})}
+</div>
+
+<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
+${ plotter.boxplot(id = 'group_distance', header = True, row_names = False, smp_attr = [0], 
+												title= "",
+												x_label= "Median distance (normalized)",
+                                                format='long', group=['pathway'], 
+                                                config={'groupingFactors': ["pathway"], 
+                                                'colorBy': 'Factor',"maxSmpStringLen": 80,
+                                                'graphOrientation':'vertical',
+                                                'smpTextRotate':30,
+                                                'smpTextScaleFontFactor':1.2}) }
 </div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
@@ -39,6 +52,11 @@ ${plotter.scatter2D(id = 'hlcgroup2size', header=False, fields=[1], title= "Size
 			x_label= "Cluster Size", y_label= "Number of clusters", config={"showHistogram": True,"histogramBins":10, "showLegend":False})}
 ${plotter.scatter2D(id = 'louvaingroup2size', header=False, fields=[1], title= "Size distribution in Louvain clustering", 
 			x_label= "Cluster Size", y_label= "Number of clusters", config={"showHistogram": True,"histogramBins":10, "showLegend":False})}
+</div>
+
+<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
+${plotter.scatter2D(id = 'all_group_size', header=False, fields=[1], title= "Size distribution in external group clustering", 
+			x_label= "Group Size", y_label= "Number of groups", config={"showHistogram": True,"histogramBins":10, "showLegend":False})}
 </div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
@@ -82,7 +100,7 @@ ${plotter.scatter2D(id = 'louvaingroup2size', header=False, fields=[1], title= "
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'all_quality_metrics', header=True, fields=[5,2], title= "(E) Mean distance vs group diameter", 
 			x_label= "Internal Edge density", y_label= "Mean distance (normalized)",
-		 smp_attr= [0,1,4,5], config={"colorBy": "Implementation", "objectColorTransparency": 0.2,"objectBorderColor": "#ffffff",
+		 smp_attr= [0,1,4,5], config={"colorBy": "Implementation", "setMinY":-4, "objectColorTransparency": 0.2,"objectBorderColor": "#ffffff",
 		 "hoverTemplate": """Diam: {diam} <br> size:{size}""","showRegressionFit":"Implementation", "showRegressionFullRange":True, "colorScheme": "Tableau"})}
 		${plotter.scatter2D(id = 'all_quality_metrics', header=True, fields=[5,3],  title= "(F) Median distance vs group diameter", 
 			x_label= "Internal Edge density", y_label= "Median distance (normalized)",
@@ -110,6 +128,13 @@ ${plotter.scatter2D(id = 'louvaingroup2size', header=False, fields=[1], title= "
 		 smp_attr= [0,1], config={"colorBy": "Implementation"})}
 </div>
 
+<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
+	${plotter.boxplot(id = 'relative_metrics', row_names= False, header=True, title= "(A) Mean distance between groups", x_label= "Mean distance (normalized)",
+		fields=[2], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"], "colorBy": "execution_type"})}
+	${plotter.boxplot(id = 'relative_metrics', row_names= False, header=True, title= "(B) Median distance between groups", x_label= "Median distance (normalized)",
+ 	fields=[3], smp_attr= [0], group="execution_type", config={"groupingFactors": ["execution_type"],
+ 	 "colorBy": "execution_type"})}
+</div>
 
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'relative_metrics', header=True, fields=[4,2], title= "(C) Mean distance vs group size", 

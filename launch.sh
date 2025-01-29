@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export EXEC_PATH=$FSCRATCH/RARE_testing
+export EXEC_PATH=$FSCRATCH/embedding_hlc_benchmark
 export CODE_PATH=~/projects/RARE/src 
 mkdir -p $EXEC_PATH
 export INITIAL_PATH=`pwd`

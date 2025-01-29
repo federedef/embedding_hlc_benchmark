@@ -65,21 +65,30 @@ get_quality_from_external_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lo
 		if [ -s quality_metrics ] ; then
 			awk -v exectype="$exectype" 'BEGIN{FS="\t";OFS="\t"}{print exectype,$0}' quality_metrics > final_quality_metrics
 			awk -v exectype="$exectype" 'BEGIN{FS="\t";OFS="\t"}{print exectype,$0}' relative_quality_metrics > final_relative_quality_metrics
+			awk -v exectype="$exectype" 'BEGIN{FS="\t";OFS="\t"}{print exectype,$0}' group_distance > final_group_distance
 		fi
 	fi
 }
 
 report_quality){
 	source ~soft_bio_267/initializes/init_python
+	source ~/dev_py/myenv/bin/activate
 	PATH=$template:$PATH
 	cat !get_quality_from_external_!/final_quality_metrics > quality_metrics
 	cat !get_quality_from_external_!/final_relative_quality_metrics > relative_quality_metrics
+	cat !get_quality_from_external_!/final_group_distance > final_group_distance
 	echo -e "baseline;launch_RARE_baseline)/embedding_matrix,\
 	justnet;launch_RARE_justnet)/embedding_matrix,\
-	justcomm;launch_RARE_justcom)/embedding_matrix,\
-	justcomm_lou;launch_RARE_justcom_lou)/embedding_matrix,\
+	justcom;launch_RARE_justcom)/embedding_matrix,\
+	justcom_lou;launch_RARE_justcom_lou)/embedding_matrix,\
 	netcom;launch_RARE_netcom)/embedding_matrix,\
 	netcom_lou;launch_RARE_netcom_lou)/embedding_matrix" > emb_data
+	echo -e "baseline;get_quality_from_external_baseline)/distance_matrix,\
+	justnet;get_quality_from_external_justnet)/distance_matrix,\
+	justcom;get_quality_from_external_justcom)/distance_matrix,\
+	justcom_lou;get_quality_from_external_justcom_lou)/distance_matrix,\
+	netcom;get_quality_from_external_netcom)/distance_matrix,\
+	netcom_lou;get_quality_from_external_netcom_lou)/distance_matrix" > dist_data
 
 	if [ -s $external_path ] ; then
 		?
@@ -87,7 +96,9 @@ report_quality){
 		--emb_pos `cat emb_data` \
 		--communities "HLC;$input_path/clusters/$dataset,Louvain;$input_path/clusters/louvain_$dataset" \
 		--external_groups $external_path -o "quality_metrics_$dataset" \
-		--external_group_description "$external2description_path"
+		--external_group_description "$external2description_path" \
+		--group_distance final_group_distance \
+		--embedding_distances `cat dist_data`
 	fi
 }
 
