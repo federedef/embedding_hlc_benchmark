@@ -1,4 +1,4 @@
-%launch_RARE_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
+launch_RARE_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
 	resources: -c 20 -m 100gb
 	source ~soft_bio_267/initializes/init_python
 	export PATH=$code_path:$PATH
@@ -41,7 +41,7 @@
 	mv kernel_matrix_bin.npy embedding_matrix.npy
 }
 
-%get_spearman_corr){
+get_spearman_corr){
 	resources: -c 20 -m 20gb 
 	source ~soft_bio_267/initializes/init_python
 	export PATH=$template:$PATH
@@ -53,7 +53,7 @@
 	report_corr.py -R launch_RARE_justcom)/embedding_matrix.npy -G launch_RARE_justcom)/embedding_matrix.npy -r launch_RARE_justcom)/embedding_matrix.lst -g launch_RARE_justcom)/embedding_matrix.lst -t $template/corr.txt -o "justcom_justcom_$dataset"
 }
 
-%get_quality_from_external_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
+get_quality_from_external_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
 	resources: -c 20 -m 50gb -A exclusive
 	source ~soft_bio_267/initializes/init_python
 	PATH=$scripts_code:$PATH
@@ -70,7 +70,7 @@
 	fi
 }
 
-%ranking_groups_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
+ranking_groups_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
 	resources: -m 50gb 
 	source ~soft_bio_267/initializes/init_python
 	source ~/dev_py/netenv/bin/activate
