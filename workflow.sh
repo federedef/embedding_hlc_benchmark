@@ -73,7 +73,6 @@ get_quality_from_external_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lo
 ranking_groups_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
 	resources: -m 50gb 
 	source ~soft_bio_267/initializes/init_python
-	source ~/dev_py/netenv/bin/activate
 	text2binary_matrix -i $input_path/edges/$dataset -t pair -O bin -o adj_matrix
 	text2binary_matrix -i !launch_RARE_*!/embedding_matrix.npy -t "bin" -O "bin" --coords2kernel "dotProduct" -o kernel --cosine_normalization
 	exectype=(*)
