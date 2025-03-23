@@ -26,31 +26,31 @@ The script accepts the following arguments to specify the operation mode:
 1. **Dataset Preparation (`d`)**:
    Prepares the datasets for processing, including generating clusters, creating translators, and downloading external resources.
    ```bash
-   ./script.sh d
+   ./launch.sh d
    ```
 
 2. **Workflow Execution (`wf`)**:
    Executes workflows for each dataset using AutoFlow.
    ```bash
-   ./script.sh wf
+   ./launch.sh wf
    ```
 
 3. **Result Collection (`r`)**:
    Gathers the results from workflow executions and copies them to a `results/` directory.
    ```bash
-   ./script.sh r
+   ./launch.sh r
    ```
 
 4. **Workflow Monitoring (`check`)**:
    Monitors the progress of workflows using `flow_logger`.
    ```bash
-   ./script.sh check
+   ./launch.sh check
    ```
 
 5. **Workflow Recovery (`recover`)**:
    Recovers failed or incomplete workflows using `flow_logger`.
    ```bash
-   ./script.sh recover
+   ./launch.sh recover
    ```
 
 ## Directory Structure
@@ -83,15 +83,15 @@ You can modify the `datasets` variable to include additional datasets.
 To run the workflow:
 1. Prepare datasets:
    ```bash
-   ./script.sh d
+   ./launch.sh d
    ```
 2. Execute workflows:
    ```bash
-   ./script.sh wf
+   ./launch.sh wf
    ```
 3. Collect results:
    ```bash
-   ./script.sh r
+   ./launch.sh r
    ```
 
 ## Troubleshooting
