@@ -7,6 +7,8 @@
  		 "colorBy": "Implementation", "xAxisTextScaleFontFactor":1.3, 'smpTextScaleFontFactor':1.3})}
 </div>
 
+${plotter.table(id='rankings', header=True,  text= True, row_names = True, fields= list(range(0,9)), styled='dt', border= 2, attrib = {'class' : 'table table-striped'})}
+
 <div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 ${ plotter.boxplot(id = 'group_distance', header = True, row_names = False, smp_attr = [0], 
 												title= "",
@@ -34,16 +36,19 @@ ${ plotter.boxplot(id = 'group_distance', header = True, row_names = False, smp_
 	<div style="overflow: hidden; display: flex; flex-direction: row; justify-content: center;">
 		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"External group in {alg_type} embedding", 
 			x_label= "UMAP-1", y_label= "UMAP-2",
-		 smp_attr= [6], config={"colorBy": "Reactome Pathway Description", "dataPointSize": 5, "showLegend":True,
-		  "objectBorderColor": "#ffffff", "colorScheme": "Tableau"})}
+		 smp_attr= [6,7,8,9], config={"colorBy": "Reactome Pathway Description", "dataPointSize": 10, "showLegend":True,
+		  "objectBorderColor": "#ffffff", "colorScheme": "Tableau",  "shapeBy" : "type", "hoverTemplate": """Gene symbol: {gene_symbol} <br> 
+		  <br> Gene ensemble: {gene_ens}"""})}
 		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"HLC communities in {alg_type} embedding", 
 			x_label= "UMAP-1", y_label= "UMAP-2",
-		 smp_attr= [1], config={"colorBy": "HLC cluster", "dataPointSize": 5, "objectBorderColor": "#ffffff", "showLegend":True,
-		  "colorScheme": "Tableau"})}
+		 smp_attr= [1,7,8], config={"colorBy": "HLC cluster", "dataPointSize": 10, "objectBorderColor": "#ffffff", "showLegend":True,
+		  "colorScheme": "Tableau","hoverTemplate": """Gene symbol: {gene_symbol} <br> 
+		  <br> Gene ensemble: {gene_ens}"""})}
 		${plotter.scatter2D(id = 'embedding_table', header=True, fields=[4,5], title= f"Louvain communities for {alg_type} embbeding", 
 			x_label= "UMAP-1", y_label= "UMAP-2",
-		 smp_attr= [2], config={"colorBy": "Louvain cluster", "dataPointSize": 5,"objectBorderColor": "#ffffff", "showLegend":True,
-		 "colorScheme": "Tableau"})}
+		 smp_attr= [2,7,8], config={"colorBy": "Louvain cluster", "dataPointSize": 10,"objectBorderColor": "#ffffff", "showLegend":True,
+		 "colorScheme": "Tableau","hoverTemplate": """Gene symbol: {gene_symbol} <br> 
+		  <br> Gene ensemble: {gene_ens}"""})}
 	</div>
 % endfor
 
