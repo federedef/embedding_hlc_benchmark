@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export EXEC_PATH=$FSCRATCH/embedding_hlc_benchmark
+export EXEC_PATH=$FSCRATCH/RARE_testing
 export CODE_PATH=~/projects/RARE/src 
 mkdir -p $EXEC_PATH
 export INITIAL_PATH=`pwd`
@@ -75,9 +75,11 @@ if [ "$1" == "wf" ] ; then
           \\$input_path=$INPUT_PATH,
           \\$template=$REPORT_PATH,
           \\$code_path=$CODE_PATH,
-          \\$external_path=$INPUT_PATH/externals/${dataset},
-          \\$external2description_path=$INPUT_PATH/externals/${dataset}_external2description,
-          \\$scripts_code=$INITIAL_PATH/scripts
+          \\$external_path=$INPUT_PATH/externals/rasopat_${dataset},
+          \\$external2description_path=$INPUT_PATH/externals/rasopat_description,
+          \\$scripts_code=$INITIAL_PATH/scripts,
+          \\$name_nodes=$INPUT_PATH/translators/${dataset},
+          \\$name_nodes_symbol=$INPUT_PATH/translators/${dataset}_symbol
         " | tr -d [:space:]`
         AutoFlow -e -w ./workflow.sh -V $variables -o $EXEC_PATH/$dataset -m 20gb -t 3-00:00:00 -n cal -s 3 
     done
