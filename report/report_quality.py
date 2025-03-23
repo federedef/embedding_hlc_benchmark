@@ -7,6 +7,7 @@ from py_report_html import Py_report_html
 import py_exp_calc.exp_calc as pxc
 import umap
 import copy 
+import pandas as pd
 
 ##############################################################################################
 ## METHODS
@@ -53,7 +54,6 @@ def get_umap_with_labels(embedding_npy, embedding_node_names, node2external_grou
         for external_group in external_groups:
             ext_group_description = ext_groups_description.get(external_group, "background")
             table.append([external_group, "cluster-"+community_HLC, "cluster-"+community_Lou, str(node), str(pos1), str(pos2), ext_group_description])
-    
     return table
 
 def open_groups(path2groups, top=11, group_col= 0, node_col = 1, sep = "\t", filter_by=None):
@@ -90,12 +90,19 @@ def open_groups(path2groups, top=11, group_col= 0, node_col = 1, sep = "\t", fil
                 node2group[node].append(group)
             else:
                 node2group[node] = [group]
-
     return node2group, [[group, size] for group, size in group2size.items()], groups
 
 def parse_methods(table, method_parser, col_i = 0):
     for row in table:
         row[col_i] = method_parser[row[col_i]]
+
+def read_file_to_dict(file_path):
+    result_dict = {}
+    with open(file_path) as f:
+        for line in f:
+            line = line.strip().split("\t")
+            result_dict[line[1]] = line[0]
+    return result_dict
 
 ##############################################################################################
 ## OPTPARSE
@@ -106,6 +113,12 @@ parser.add_argument("-i", "--quality_metrics", dest="quality_metrics", default=N
     help="Path to quality_metrics")
 parser.add_argument("-r", "--relative_pos", dest="relative_pos", default=None,
     help="Path to relative position")
+parser.add_argument("--prioritization", dest="prioritization", default=None,
+    help="Path to ranking prioritization")
+parser.add_argument("--gene_names_ens", dest="gene_names_ens", default=None,
+    help="Path to node id to ens identifier")
+parser.add_argument("--gene_names_symbol", dest="gene_names_symbol", default=None,
+    help="Path to node id to ens identifier")
 parser.add_argument("--group_distance",dest="group_distance", default=None, help="distance inside nodes of the same external group")
 parser.add_argument("--emb_pos", dest="emb_pos", default=None, type = lambda x: {i.split(";")[0]:i.split(";")[1] for i in x.split(",")}, help="path to embedding position")
 parser.add_argument("--embedding_distances", dest="embedding_distances", 
@@ -123,17 +136,56 @@ opts = parser.parse_args()
 ################################################################################################
 # MAIN
 ################################################################################################
-import pandas as pd
 quality_metrics = open_metrics(opts.quality_metrics)
 relative_pos = open_metrics(opts.relative_pos)
 group_distance = open_metrics(opts.group_distance)
+rankings = open_metrics(opts.prioritization)
+top_subset = 5
 
-all_quality_metrics = [row for row in quality_metrics if float(row[4])>4 and row[0] in ["baseline","justnet","justcom","netcom","justcom_lou","netcom_lou"]]
+ranking_dic = {}
+for rank in rankings:
+    if rank[0] != "netcom": continue
+    if rank[6] in ranking_dic:
+        ranking_dic[rank[6]].append(rank)
+    else:
+        ranking_dic[rank[6]] = [rank]
+
+subset_ranking_dic = {}
+for key, value in ranking_dic.items():
+    subset_ranking_dic[key] = value[0:top_subset]
+#
+#print(ranking_dic)
+top_subset_ranking = []
+for key, value in subset_ranking_dic.items():
+    top_subset_ranking.extend(value)
+
+print(top_subset_ranking)
+
+#print(rankings)
+candidates2seed = {}
+for row in top_subset_ranking:
+    if row[0] == "netcom":
+        if candidates2seed.get(row[1]):
+            candidates2seed[row[1]].append(row[6])
+        else:
+            candidates2seed[row[1]] = [row[6]]
+
+#candidates2seed = {row[1]: row[6] for row in rankings if row[0] == "netcom"}
+
+idnode2ens = {}
+if opts.gene_names_ens:
+    idnode2ens = read_file_to_dict(opts.gene_names_ens)
+idnode2symbol = {}
+if opts.gene_names_symbol:
+    idnode2symbol = read_file_to_dict(opts.gene_names_symbol)
+
+all_quality_metrics = [row for row in quality_metrics if float(row[4])>0 and row[0] in ["baseline","justnet","justcom","netcom","justcom_lou","netcom_lou"]]
 all_quality_metrics = copy.deepcopy(all_quality_metrics)
-quality_metrics = [row for row in quality_metrics if float(row[4])>4 and float(row[5])>0.75 and row[0] in ["baseline","justnet","justcom","netcom","justcom_lou","netcom_lou"]]
+quality_metrics = [row for row in quality_metrics if float(row[4])>0 and float(row[5])<=1 and row[0] in ["baseline","justnet","justcom","netcom","justcom_lou","netcom_lou"]]
 
 flitered_groups = list(set([row[1] for row in quality_metrics]))
-node2external_group, all_group_size, selected_external_groups = open_groups(opts.external_groups, top=10, filter_by=flitered_groups)
+node2external_group, all_group_size, selected_external_groups = open_groups(opts.external_groups, top=10, filter_by= None)#flitered_groups)#None)#flitered_groups)
+
 parse_names = { "baseline": "baseline",
                 "justnet":"neigh",
                 "justcom":"HLC_comm",
@@ -149,6 +201,11 @@ if not opts.external_group_description:
     ext_groups_description = {group: group for group in all_groups}
 ext_groups_description = {group: description for group, description in open_metrics(opts.external_group_description)}
 
+for row in rankings: # 'netcom', '2946', '0.997615269917237', '0.0002471424158171146', '4', '4', 'CBL-related disorder'
+    row[0] = parse_names[row[0]]
+    row.append(idnode2ens[row[1]])
+    row.append(idnode2symbol.get(row[1],"NA"))
+rankings.insert(0, ["embedding_method","candidate","score","relative_pos","rank","rank_uniq","syndrome", "gene_ens","gene_symbol"])
 
 group_distance = [[parse_names[row[0]],ext_groups_description[row[1]],*row[2:]] for row in group_distance if row[1] in selected_external_groups]
 i = 0
@@ -178,7 +235,7 @@ list_of_lists[0][0] = "pathway"
 
 node2HLCcommunity, hlcgroup2size, _ = open_groups(opts.communities["HLC"],top=21)
 node2Loucommunity, louvaingroup2size, _ = open_groups(opts.communities["Louvain"],top=21)
-
+print("new")
 alg_type2table = {}
 for alg_type, emb_pos_data in opts.emb_pos.items():
     embedding_npy = np.load(emb_pos_data+".npy")
@@ -187,7 +244,20 @@ for alg_type, emb_pos_data in opts.emb_pos.items():
                                         node2external_group, node2HLCcommunity, 
                                         node2Loucommunity, ext_groups_description,
                                          random_seed = 123)
-    embedding_table.insert(0, ["Reactome Pathway","HLC cluster","Louvain cluster","node","dim1","dim2", "Reactome Pathway Description"])
+    ext_table = []
+    for row in embedding_table:
+        row.append(idnode2ens[row[3]])
+        row.append(idnode2symbol.get(row[3], "NA"))
+        ext_table.append(row + ["original"])
+        #if candidates2seed.get(row[3]):
+        #    for seed in candidates2seed[row[3]]:
+        #        ext_table.append([seed] + row[1:6] + [seed] + [row[7]] + [row[8]] + ["prioritized"])
+
+    embedding_table = ext_table
+    print(embedding_table[0])
+    print(embedding_table[1])
+
+    embedding_table.insert(0, ["Reactome Pathway","HLC cluster","Louvain cluster","node","dim1","dim2", "Reactome Pathway Description","gene_ens","gene_symbol","type"])
     alg_type2table[parse_names[alg_type]] = embedding_table
 
 relative_pos = [row for row in relative_pos if float(row[4])>4 and float(row[5])>0.75]
@@ -225,7 +295,8 @@ container = {
     'hlcgroup2size': hlcgroup2size,
     'louvaingroup2size': louvaingroup2size,
     'group_distance': list_of_lists, #group_distance,
-    'all_group_size': all_group_size
+    'all_group_size': all_group_size,
+    'rankings': rankings
 }
 
 report = Py_report_html(container, os.path.basename(opts.output))
