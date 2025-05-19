@@ -1,10 +1,13 @@
-launch_RARE_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
+launch_RARE_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou;node2vec;deepwalk;ggvec;grarep;glove;role2vec;hope;netmf;nmfadmm;nodesketch]){
 	resources: -c 20 -m 100gb
-	source ~soft_bio_267/initializes/init_python
+	source ~/dev_py/net_env/bin/activate
+	#soft_bio_267/initializes/init_python
 	export PATH=$code_path:$PATH
 	# r for neigh 
 	# m for comm
 	# t for role
+	r=1
+	m=1
 	if [ "(*)" == "justnet" ] ; then
 		r=1
 		m=0
@@ -30,15 +33,37 @@ launch_RARE_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
 	else 
 		group_nodes=$input_path/clusters/$dataset
 	fi
-	?
-	netanalyzer -i $input_path/edges/$dataset -l 'nodes' -k "comm_aware" \
-	--group_nodes $group_nodes \
-	-u 'nodes' -K ./kernel_matrix_bin \
-	--embedding_add_options "'workers':16, 'window':10, 'num_walks':10, \
-	'neigh_w':$r, 'comm_w':$m, 'walk_length': 100, 'dimensions': 128, 'hs': 1, 'sg': 1, 'negative': 0" \
-	--embedding_coords
-	mv kernel_matrix_bin_rowIds embedding_matrix.lst
-	mv kernel_matrix_bin.npy embedding_matrix.npy
+	q="1"
+	if [ "(*)" == "node2vec" ] ; then
+		k="node2vec"
+		q="2"
+	elif [ "(*)" == "deepwalk" ] ; then
+		k="deepwalk"
+	elif [ "(*)" == "ggvec" ] ; then 
+		k="ggvec"
+	elif [ "(*)" == "grarep" ] ; then 
+		k="grarep"
+	elif [ "(*)" == "glove" ] ; then 
+		k="glove"
+	else
+		k="comm_aware"
+	fi 
+	if [ "(*)" == "role2vec" -o "(*)" == "diffusion2vec" -o "(*)" == "laplacian" -o "(*)" == "walklets" -o "(*)" == "boostne" -o "(*)" == "hope" -o "(*)" == "netmf" -o "(*)" == "randne" -o "(*)" == "nmfadmm" -o "(*)" == "nodesketch" ] ; then
+		deactivate
+		source ~/dev_py/karate_env/bin/activate
+		export PATH=$scripts_code:$PATH
+		embeddings_from_karate.py --method "(*)" --edgelist $input_path/edges/$dataset --dimensions 128
+	else
+		?
+		netanalyzer -i $input_path/edges/$dataset -l 'nodes' -k "$k" \
+		--group_nodes $group_nodes \
+		-u 'nodes' -K ./kernel_matrix_bin \
+		--embedding_add_options "'workers':16, 'window':10, 'num_walks':10, 'q':$q, \
+		'neigh_w':$r, 'comm_w':$m, 'walk_length': 100, 'dimensions': 128, 'hs': 1, 'sg': 1, 'negative': 0" \
+		--embedding_coords
+		mv kernel_matrix_bin_rowIds embedding_matrix.lst
+		mv kernel_matrix_bin.npy embedding_matrix.npy
+	fi
 }
 
 get_spearman_corr){
@@ -53,7 +78,7 @@ get_spearman_corr){
 	report_corr.py -R launch_RARE_justcom)/embedding_matrix.npy -G launch_RARE_justcom)/embedding_matrix.npy -r launch_RARE_justcom)/embedding_matrix.lst -g launch_RARE_justcom)/embedding_matrix.lst -t $template/corr.txt -o "justcom_justcom_$dataset"
 }
 
-get_quality_from_external_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou]){
+get_quality_from_external_[baseline;justnet;justcom;justcom_lou;netcom;netcom_lou;node2vec;deepwalk;ggvec;grarep;glove;role2vec;hope;netmf;nmfadmm;nodesketch]){
 	resources: -c 20 -m 50gb -A exclusive
 	source ~soft_bio_267/initializes/init_python
 	PATH=$scripts_code:$PATH

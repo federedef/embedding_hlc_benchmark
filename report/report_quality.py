@@ -153,15 +153,11 @@ for rank in rankings:
 subset_ranking_dic = {}
 for key, value in ranking_dic.items():
     subset_ranking_dic[key] = value[0:top_subset]
-#
-#print(ranking_dic)
+
 top_subset_ranking = []
 for key, value in subset_ranking_dic.items():
     top_subset_ranking.extend(value)
 
-print(top_subset_ranking)
-
-#print(rankings)
 candidates2seed = {}
 for row in top_subset_ranking:
     if row[0] == "netcom":
@@ -179,19 +175,46 @@ idnode2symbol = {}
 if opts.gene_names_symbol:
     idnode2symbol = read_file_to_dict(opts.gene_names_symbol)
 
-all_quality_metrics = [row for row in quality_metrics if float(row[4])>0 and row[0] in ["baseline","justnet","justcom","netcom","justcom_lou","netcom_lou"]]
+embeddings = ["baseline",
+            #"justnet",
+            #"justcom",
+            "netcom",
+            #"justcom_lou",
+            #"netcom_lou",
+            "node2vec",
+            "deepwalk",
+            "ggvec",
+            "grarep",
+            "glove",
+            "role2vec",
+            "hope",
+            "netmf",
+            "nmfadmm",
+            "nodesketch"]
+all_quality_metrics = [row for row in quality_metrics if float(row[4])>0 and row[0] in embeddings]
 all_quality_metrics = copy.deepcopy(all_quality_metrics)
-quality_metrics = [row for row in quality_metrics if float(row[4])>0 and float(row[5])<=1 and row[0] in ["baseline","justnet","justcom","netcom","justcom_lou","netcom_lou"]]
-
+quality_metrics = [row for row in quality_metrics if float(row[4])>3 and float(row[5])>0.75 and row[0] in embeddings]
+# >3 > 0.75
 flitered_groups = list(set([row[1] for row in quality_metrics]))
-node2external_group, all_group_size, selected_external_groups = open_groups(opts.external_groups, top=10, filter_by= None)#flitered_groups)#None)#flitered_groups)
+node2external_group, all_group_size, selected_external_groups = open_groups(opts.external_groups, top=10, filter_by= flitered_groups)#None)#flitered_groups)#None)#flitered_groups)
 
 parse_names = { "baseline": "baseline",
                 "justnet":"neigh",
                 "justcom":"HLC_comm",
                 "netcom":"neigh-HLC_comm",
                 "justcom_lou":"Louvain_comm",
-                "netcom_lou":"neigh-Louvain_comm"}
+                "netcom_lou":"neigh-Louvain_comm",
+                "node2vec":"node2vec",
+                "deepwalk":"DeepWalk",
+                "ggvec":"GGVec", 
+                "grarep": "GraRep",
+                "glove":"GloVe",
+                "role2vec":"Role2Vec", 
+                "hope":   "HOPE",
+                "netmf": "NetMF",
+                "nmfadmm":   "NMFADMM",
+                "nodesketch": "NodeSketch"
+                }
 all_groups = []
 for groups in node2external_group.values():
     for group in groups:
@@ -235,25 +258,26 @@ list_of_lists[0][0] = "pathway"
 
 node2HLCcommunity, hlcgroup2size, _ = open_groups(opts.communities["HLC"],top=21)
 node2Loucommunity, louvaingroup2size, _ = open_groups(opts.communities["Louvain"],top=21)
-print("new")
+
 alg_type2table = {}
 for alg_type, emb_pos_data in opts.emb_pos.items():
     embedding_npy = np.load(emb_pos_data+".npy")
     embedding_pos = [row[0] for row in open_metrics(emb_pos_data+".lst")]
-    embedding_table = get_umap_with_labels(embedding_npy, embedding_pos, 
-                                        node2external_group, node2HLCcommunity, 
-                                        node2Loucommunity, ext_groups_description,
-                                         random_seed = 123)
+    # embedding_table = get_umap_with_labels(embedding_npy, embedding_pos, 
+    #                                     node2external_group, node2HLCcommunity, 
+    #                                     node2Loucommunity, ext_groups_description,
+    #                                      random_seed = 123)
     ext_table = []
-    for row in embedding_table:
-        row.append(idnode2ens[row[3]])
-        row.append(idnode2symbol.get(row[3], "NA"))
-        ext_table.append(row + ["original"])
-        #if candidates2seed.get(row[3]):
-        #    for seed in candidates2seed[row[3]]:
-        #        ext_table.append([seed] + row[1:6] + [seed] + [row[7]] + [row[8]] + ["prioritized"])
+    #for row in embedding_table:
+        #row.append(idnode2ens[row[3]])
+        #row.append(idnode2symbol.get(row[3], "NA"))
+        #ext_table.append(row + ["original"])
+        ##if candidates2seed.get(row[3]):
+        ##    for seed in candidates2seed[row[3]]:
+        ##        ext_table.append([seed] + row[1:6] + [seed] + [row[7]] + [row[8]] + ["prioritized"])
 
-    embedding_table = ext_table
+    # embedding_table = ext_table
+    embedding_table = [[1,2,3,4,3,2,3,1,2], [1,2,3,4,3,2,3,1,2], [1,2,3,4,3,2,3,1,2], [1,2,3,4,3,2,3,1,2]]
     print(embedding_table[0])
     print(embedding_table[1])
 
@@ -272,6 +296,14 @@ parse_methods(relative_pos, parse_names)
 all_quality_metrics.insert(0, ["Implementation","group","mean","median","size","ied", "tpr", "cr", "diam"])
 quality_metrics = [[row[0],row[1],*row[2:]] for row in quality_metrics]
 quality_metrics.insert(0, ["Implementation","group","mean","median","size","ied", "tpr", "cr", "diam"])
+# pass to dataframe
+quality_metrics_df = pd.DataFrame(quality_metrics[1:], columns=quality_metrics[0])
+quality_metrics_df['mean'] = pd.to_numeric(quality_metrics_df['mean'], errors='coerce')
+quality_metrics_df["Median Implementation"] = quality_metrics_df.groupby('Implementation')['mean'].transform('median')
+quality_metrics_df = quality_metrics_df.sort_values(by='Median Implementation', ascending=True)
+quality_metrics = quality_metrics_df.values.tolist()
+quality_metrics.insert(0, ["Implementation","group","mean","median","size","ied", "tpr", "cr", "diam","Median Implementation"])
+
 relative_pos.insert(0, ["Implementation","group","mean","median","size","ied", "tpr", "cr", "diam"])
 group_distance = [[row[0],row[1],row[2]] for row in group_distance]
 
@@ -283,7 +315,6 @@ for row in group_distance:
 group_distance = ext_table
 group_distance.insert(0, ["Implementation","Group", "distance"])
 group_distance = [[row[1],row[0],row[2]] for row in group_distance]
-
 
 container = {
     'all_quality_metrics': all_quality_metrics,
@@ -298,6 +329,7 @@ container = {
     'all_group_size': all_group_size,
     'rankings': rankings
 }
+
 
 report = Py_report_html(container, os.path.basename(opts.output))
 report.compress = True
